@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ho-for Children | Label Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --accent: #1b3a5c;
+    --accent2: #e07b39;
+    --accent3: #3a86c8;
+    --text: #1a1a1a;
+    --muted: #888;
+    --border: #e0dcd5;
+    --green-bg: #d8f3e3; --green-txt: #1b5e37;
+    --orange-bg: #fdebd8; --orange-txt: #8c3e0e;
+    --blue-bg: #d8eaf8; --blue-txt: #1a4e7a;
+    --purple-bg: #ede8f8; --purple-txt: #4a2e8c;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 13px; min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 28px;
+    background: var(--accent);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .owl-logo { width: 48px; height: 48px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.92; }
+  .logo-text { }
+  .logo-main { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 0.14em; color: #fff; line-height: 1; }
+  .logo-sub { font-size: 10px; color: rgba(255,255,255,0.55); letter-spacing: .12em; margin-top: 2px; }
+  .header-meta { font-size: 11px; color: rgba(255,255,255,0.6); text-align: right; line-height: 1.8; }
+  .header-meta span { color: #fff; }
+
+  /* MAIN GRID */
+  .main { display: grid; grid-template-columns: 1fr 1fr 260px; gap: 14px; padding: 18px 28px; max-width: 1100px; margin: 0 auto; }
+
+  /* PANEL */
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+  .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .panel-title { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: .15em; color: var(--accent); }
+  .badge { font-size: 10px; background: var(--accent); color: #fff; padding: 2px 8px; border-radius: 20px; font-weight: 700; }
+
+  /* STRATEGY PANEL — full width */
+  .panel-strategy { grid-column: 1 / 4; }
+  .strategy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .strategy-card {
+    background: var(--surface2); border-radius: 6px; padding: 12px 14px;
+    border-left: 3px solid var(--accent);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .strategy-card.orange { border-color: var(--accent2); }
+  .strategy-card.blue   { border-color: var(--accent3); }
+  .strategy-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .strategy-title { font-weight: 700; font-size: 13px; color: var(--text); }
+  .strategy-body { font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .strategy-link {
+    font-size: 11px; color: var(--accent3); text-decoration: none; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 2px;
+  }
+  .strategy-link:hover { text-decoration: underline; }
+  .strategy-link::after { content: '→'; }
+
+  /* RELEASE */
+  .panel-release { grid-column: 1 / 3; }
+  .release-item { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .release-item:last-child { border-bottom: none; }
+  .release-date { text-align: center; }
+  .release-date .day { font-family: 'Bebas Neue', sans-serif; font-size: 26px; line-height: 1; color: var(--accent); }
+  .release-date .month { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+  .release-info .title { font-weight: 700; font-size: 13px; margin-bottom: 2px; }
+  .release-info .artist { font-size: 11px; color: var(--muted); }
+  .release-type { font-size: 10px; padding: 3px 9px; border-radius: 20px; font-weight: 700; }
+  .type-single { background: var(--green-bg); color: var(--green-txt); }
+  .type-album  { background: var(--orange-bg); color: var(--orange-txt); }
+  .type-mv     { background: var(--blue-bg); color: var(--blue-txt); }
+  .type-ep     { background: var(--purple-bg); color: var(--purple-txt); }
+
+  /* ARTISTS */
+  .panel-artists { grid-column: 3 / 4; grid-row: 2 / 4; }
+  .artist-card { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .artist-card:last-child { border-bottom: none; }
+  .artist-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; flex-shrink: 0; color: #fff; }
+  .artist-info .name { font-weight: 700; font-size: 12px; margin-bottom: 1px; }
+  .artist-info .genre { font-size: 10px; color: var(--muted); }
+  .artist-status { margin-left: auto; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 700; }
+  .st-active { background: var(--green-bg); color: var(--green-txt); }
+  .st-prep   { background: var(--orange-bg); color: var(--orange-txt); }
+  .st-hold   { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  /* RADIO PROGRAM */
+  .panel-radio { grid-column: 1 / 3; }
+  .radio-item { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .radio-item:last-child { border-bottom: none; }
+  .radio-info .ep-title { font-weight: 700; font-size: 12px; margin-bottom: 2px; }
+  .radio-info .ep-date  { font-size: 11px; color: var(--muted); }
+  .progress-wrap { width: 90px; }
+  .progress-label { font-size: 10px; color: var(--muted); margin-bottom: 3px; display: flex; justify-content: space-between; }
+  .progress-bar { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width .4s; }
+  .progress-fill.orange { background: var(--accent2); }
+  .progress-fill.green  { background: #2d6a4f; }
+  .radio-status { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 700; white-space: nowrap; }
+  .rs-done    { background: var(--green-bg); color: var(--green-txt); }
+  .rs-wip     { background: var(--orange-bg); color: var(--orange-txt); }
+  .rs-plan    { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  /* TASKS */
+  .panel-tasks { grid-column: 1 / 3; }
+  .task-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .task-item:last-child { border-bottom: none; }
+  .task-check { width: 17px; height: 17px; border: 2px solid var(--border); border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: border-color .15s, background .15s; }
+  .task-check:hover { border-color: var(--accent); }
+  .task-check.done { border-color: var(--accent); background: var(--accent); }
+  .task-check.done::after { content: ''; width: 9px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translateY(-1px); display: block; }
+  .task-text { flex: 1; font-size: 12px; }
+  .task-text.done-text { color: var(--muted); text-decoration: line-through; }
+  .task-assignee { font-size: 10px; color: var(--muted); background: var(--surface2); padding: 2px 7px; border-radius: 20px; white-space: nowrap; }
+  .task-due { font-size: 10px; padding: 2px 7px; border-radius: 20px; white-space: nowrap; }
+  .due-urgent { background: #fdebd8; color: #8c3e0e; font-weight: 700; }
+  .due-normal { color: var(--muted); }
+  .add-task-row { display: flex; gap: 8px; margin-top: 12px; }
+  .add-task-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; font-size: 12px; font-family: 'Noto Sans JP', sans-serif; border-radius: 6px; outline: none; transition: border-color .15s; }
+  .add-task-input:focus { border-color: var(--accent); background: #fff; }
+  .add-task-btn { background: var(--accent); color: #fff; border: none; padding: 8px 16px; font-size: 12px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; border-radius: 6px; cursor: pointer; transition: opacity .15s; }
+  .add-task-btn:hover { opacity: .85; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <img class="owl-logo" src="data:image/gif;base64,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" alt="Ho-for Children Logo">
+    <div class="logo-text">
+      <div class="logo-main">HO-FOR CHILDREN</div>
+      <div class="logo-sub">LABEL OPERATIONS DASHBOARD</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div><span id="now-date"></span></div>
+    <div>Representative: <span>今野敏博</span></div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- 経営戦略 -->
+  <div class="panel panel-strategy">
+    <div class="panel-header">
+      <div class="panel-title">MANAGEMENT STRATEGY</div>
+      <span style="font-size:11px;color:var(--muted)">2025–2027</span>
+    </div>
+    <div class="strategy-grid">
+      <div class="strategy-card">
+        <div class="strategy-label">事業の柱①</div>
+        <div class="strategy-title">音楽レーベル＆制作サポート</div>
+        <div class="strategy-body">BtoB。アーティストへの配信・プロモーション支援を3段階パッケージで提供。月次契約モデルへの移行を推進。</div>
+        <a class="strategy-link" href="#" target="_blank">詳細ドキュメント</a>
+      </div>
+      <div class="strategy-card orange">
+        <div class="strategy-label">事業の柱②</div>
+        <div class="strategy-title">デジタル出版・電子書籍</div>
+        <div class="strategy-body">BtoC。コンテンツのデジタル化と配信を軸に収益の多様化を図る。AIツールを活用した制作効率化が鍵。</div>
+        <a class="strategy-link" href="#" target="_blank">詳細ドキュメント</a>
+      </div>
+      <div class="strategy-card blue">
+        <div class="strategy-label">事業の柱③</div>
+        <div class="strategy-title">ラジオ番組制作</div>
+        <div class="strategy-body">FM小田原「ホーホーチルドレン」を軸に、自社メディアとしてのブランド力強化。レーベルとの相乗効果を最大化。</div>
+        <a class="strategy-link" href="#" target="_blank">詳細ドキュメント</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- RELEASE SCHEDULE -->
+  <div class="panel panel-release">
+    <div class="panel-header">
+      <div class="panel-title">RELEASE SCHEDULE</div>
+      <span style="font-size:11px;color:var(--muted)">直近のリリース予定</span>
+    </div>
+    <div class="release-item">
+      <div class="release-date"><div class="day">07</div><div class="month">Jul</div></div>
+      <div class="release-info"><div class="title">夏の記憶</div><div class="artist">Yuki Nakamura</div></div>
+      <span class="release-type type-single">Single</span>
+    </div>
+    <div class="release-item">
+      <div class="release-date"><div class="day">14</div><div class="month">Jul</div></div>
+      <div class="release-info"><div class="title">Deep City Vol.3</div><div class="artist">Ryo Matsuda</div></div>
+      <span class="release-type type-album">Album</span>
+    </div>
+    <div class="release-item">
+      <div class="release-date"><div class="day">20</div><div class="month">Jul</div></div>
+      <div class="release-info"><div class="title">光の中へ — MV</div><div class="artist">Sena Inoue</div></div>
+      <span class="release-type type-mv">MV</span>
+    </div>
+    <div class="release-item">
+      <div class="release-date"><div class="day">01</div><div class="month">Aug</div></div>
+      <div class="release-info"><div class="title">Untitled EP</div><div class="artist">Haruto × DJ TOSHI</div></div>
+      <span class="release-type type-ep">EP</span>
+    </div>
+  </div>
+
+  <!-- ARTISTS -->
+  <div class="panel panel-artists">
+    <div class="panel-header">
+      <div class="panel-title">ARTISTS</div>
+      <span class="badge">5</span>
+    </div>
+    <div class="artist-card">
+      <div class="artist-avatar" style="background:#1b3a5c">YN</div>
+      <div class="artist-info"><div class="name">Yuki Nakamura</div><div class="genre">City Pop / R&amp;B</div></div>
+      <span class="artist-status st-active">Active</span>
+    </div>
+    <div class="artist-card">
+      <div class="artist-avatar" style="background:#c17a3a">RM</div>
+      <div class="artist-info"><div class="name">Ryo Matsuda</div><div class="genre">Soul / Funk</div></div>
+      <span class="artist-status st-active">Active</span>
+    </div>
+    <div class="artist-card">
+      <div class="artist-avatar" style="background:#3a86c8">SI</div>
+      <div class="artist-info"><div class="name">Sena Inoue</div><div class="genre">J-Pop / Electronic</div></div>
+      <span class="artist-status st-active">Active</span>
+    </div>
+    <div class="artist-card">
+      <div class="artist-avatar" style="background:#8a7a6a">HK</div>
+      <div class="artist-info"><div class="name">Haruto Kida</div><div class="genre">Hip-Hop</div></div>
+      <span class="artist-status st-prep">Prep</span>
+    </div>
+    <div class="artist-card">
+      <div class="artist-avatar" style="background:#aaa">MO</div>
+      <div class="artist-info"><div class="name">Mia Ogawa</div><div class="genre">Ambient / Neo Soul</div></div>
+      <span class="artist-status st-hold">Hold</span>
+    </div>
+  </div>
+
+  <!-- RADIO PROGRAM -->
+  <div class="panel panel-radio">
+    <div class="panel-header">
+      <div class="panel-title">RADIO PROGRAM — FM小田原「ホーホーチルドレン」</div>
+      <span style="font-size:11px;color:var(--muted)">番組制作進捗</span>
+    </div>
+    <div class="radio-item">
+      <div class="radio-info">
+        <div class="ep-title">#142 Clive Davis トリビュート特集</div>
+        <div class="ep-date">放送予定: 7月13日</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>進捗</span><span>90%</span></div>
+        <div class="progress-bar"><div class="progress-fill green" style="width:90%"></div></div>
+      </div>
+      <span class="radio-status rs-wip">最終確認中</span>
+    </div>
+    <div class="radio-item">
+      <div class="radio-info">
+        <div class="ep-title">#143 1970年代 ソウル特集（非Motown）</div>
+        <div class="ep-date">放送予定: 7月20日</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>進捗</span><span>60%</span></div>
+        <div class="progress-bar"><div class="progress-fill orange" style="width:60%"></div></div>
+      </div>
+      <span class="radio-status rs-wip">制作中</span>
+    </div>
+    <div class="radio-item">
+      <div class="radio-info">
+        <div class="ep-title">#144 アーティスト特集（未定）</div>
+        <div class="ep-date">放送予定: 7月27日</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>進捗</span><span>10%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
+      </div>
+      <span class="radio-status rs-plan">企画中</span>
+    </div>
+    <div class="radio-item">
+      <div class="radio-info">
+        <div class="ep-title">#141 Michael Jackson 特集</div>
+        <div class="ep-date">放送済: 7月6日</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>進捗</span><span>100%</span></div>
+        <div class="progress-bar"><div class="progress-fill green" style="width:100%"></div></div>
+      </div>
+      <span class="radio-status rs-done">放送済</span>
+    </div>
+  </div>
+
+  <!-- TASKS -->
+  <div class="panel panel-tasks">
+    <div class="panel-header">
+      <div class="panel-title">TASKS &amp; TODO</div>
+      <span class="badge" id="task-count">0</span>
+    </div>
+    <div id="task-list"></div>
+    <div class="add-task-row">
+      <input class="add-task-input" id="task-input" placeholder="タスクを追加… (Enterで確定)" />
+      <button class="add-task-btn" onclick="addTask()">+ 追加</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const d = new Date();
+  document.getElementById('now-date').textContent =
+    d.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+
+  const initTasks = [
+    { text: '「夏の記憶」Spotify / Apple Music 配信申請', assignee: '今野', due: '7/3', urgent: true, done: false },
+    { text: '#142 Clive Davis — 最終スクリプト確認', assignee: '今野', due: '7/5', urgent: true, done: false },
+    { text: 'Deep City Vol.3 プレスリリース送付', assignee: '担当A', due: '7/10', urgent: false, done: false },
+    { text: '#143 ソウル特集 プレイリスト確定', assignee: '今野', due: '7/12', urgent: false, done: false },
+    { text: 'MV撮影スタジオ予約確認', assignee: '担当B', due: '7/12', urgent: false, done: false },
+    { text: 'FM小田原 番組スクリプト確認', assignee: '今野', due: '7/8', urgent: false, done: true },
+  ];
+
+  let tasks = [...initTasks];
+
+  function renderTasks() {
+    const list = document.getElementById('task-list');
+    list.innerHTML = '';
+    document.getElementById('task-count').textContent = tasks.filter(t => !t.done).length;
+    tasks.forEach((t, i) => {
+      const row = document.createElement('div');
+      row.className = 'task-item';
+      row.innerHTML =
+        '<div class="task-check ' + (t.done ? 'done' : '') + '" onclick="toggleTask(' + i + ')"></div>' +
+        '<div class="task-text ' + (t.done ? 'done-text' : '') + '">' + t.text + '</div>' +
+        '<div class="task-assignee">' + t.assignee + '</div>' +
+        '<div class="task-due ' + (t.urgent && !t.done ? 'due-urgent' : 'due-normal') + '">' + t.due + '</div>';
+      list.appendChild(row);
+    });
+  }
+
+  function toggleTask(i) { tasks[i].done = !tasks[i].done; renderTasks(); }
+
+  function addTask() {
+    const input = document.getElementById('task-input');
+    const val = input.value.trim();
+    if (!val) return;
+    tasks.unshift({ text: val, assignee: '今野', due: '—', urgent: false, done: false });
+    input.value = '';
+    renderTasks();
+  }
+
+  document.getElementById('task-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') addTask();
+  });
+
+  renderTasks();
+</script>
+</body>
+</html>

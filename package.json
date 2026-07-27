@@ -1,0 +1,11 @@
+{
+  "name": "hfc-dashboard",
+  "version": "1.0.0",
+  "description": "Ho-for Children Label Dashboard",
+  "scripts": {
+    "build": "node scripts/build-dashboard.js"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15"
+  }
+}

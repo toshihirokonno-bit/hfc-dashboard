@@ -1,33 +1,25 @@
-yaml
 name: Update Dashboard from Notion
 on:
-  schedule:
-    - cron: '0 0 * * *'
   workflow_dispatch:
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - name: Install dependencies
-        run: npm install @notionhq/client
-      - name: Fetch Notion data and build dashboard
+      - run: npm install @notionhq/client
+      - run: node scripts/build-dashboard.js
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           RELEASES_DB_ID: ${{ secrets.RELEASES_DB_ID }}
           ARTISTS_DB_ID: ${{ secrets.ARTISTS_DB_ID }}
-        run: node scripts/build-dashboard.js
-      - name: Commit and push
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+      - run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
           git add index.html
-          git diff --staged --quiet || git commit -m "Update dashboard"
+          git diff --staged --quiet || git commit -m "Update"
           git push
 
 

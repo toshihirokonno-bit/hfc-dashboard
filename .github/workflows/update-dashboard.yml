@@ -1,0 +1,23 @@
+name: Update Dashboard from Notion
+on:
+  workflow_dispatch:
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install @notionhq/client
+      - run: node scripts/build-dashboard.js
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASES_DB_ID: ${{ secrets.RELEASES_DB_ID }}
+          ARTISTS_DB_ID: ${{ secrets.ARTISTS_DB_ID }}
+      - run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add index.html
+          git diff --staged --quiet || git commit -m "Update"
+          git push

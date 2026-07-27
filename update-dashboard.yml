@@ -1,0 +1,36 @@
+name: Update Dashboard from Notion
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 毎日午前9時（JST）に自動実行
+  workflow_dispatch:       # 手動実行も可能
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install @notionhq/client
+
+      - name: Fetch Notion data and build dashboard
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASES_DB_ID: ${{ secrets.RELEASES_DB_ID }}
+          ARTISTS_DB_ID: ${{ secrets.ARTISTS_DB_ID }}
+        run: node scripts/build-dashboard.js
+
+      - name: Commit and push updated dashboard
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add index.html
+          git diff --staged --quiet || git commit -m "🔄 ダッシュボード自動更新 $(date '+%Y-%m-%d %H:%M')"
+          git push

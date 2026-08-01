@@ -67,11 +67,15 @@ function releaseTypeClass(t) {
 async function buildHTML(releases, artists) {
   const releaseRows = releases.map(r => {
     const d = formatDate(r.date);
+    const statusClass = r.status === '公開済' ? 'rs-done' : r.status === '配信申請済' ? 'rs-wip' : 'rs-plan';
     return `
     <div class="release-item">
       <div class="release-date"><div class="day">${d.day}</div><div class="month">${d.month}</div></div>
       <div class="release-info"><div class="title">${r.title}</div><div class="artist">${r.artist}</div></div>
-      <span class="release-type ${releaseTypeClass(r.type)}">${r.type}</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        <span class="release-type ${releaseTypeClass(r.type)}">${r.type}</span>
+        <span class="radio-status ${statusClass}">${r.status}</span>
+      </div>
     </div>`;
   }).join('');
 
@@ -83,6 +87,7 @@ async function buildHTML(releases, artists) {
     </div>`).join('');
 
   const owlB64 = fs.readFileSync('scripts/owl_b64.txt', 'utf8').trim();
+  const faviconB64 = fs.readFileSync('scripts/favicon_b64.txt', 'utf8').trim();
   const notionUrl = 'https://app.notion.com/p/3a568f0cd30d816daac7fd07d13f96ca';
 
   return `<!DOCTYPE html>
@@ -91,6 +96,7 @@ async function buildHTML(releases, artists) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ho-for Children | Label Dashboard</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,${faviconB64}">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;700&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
